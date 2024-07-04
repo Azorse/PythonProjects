@@ -37,7 +37,7 @@ def check_thresholds(price):
         message = f"@here: Good time to buy! Current price is {price} gold."
         send_discord_alert(message)
     else:
-        print(f"No action needed. Current price is {price} gold.")
+        print(f"No action taken")
 
 class BlizzardApiClient:
     def __init__(self):
