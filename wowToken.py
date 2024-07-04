@@ -29,7 +29,7 @@ def send_discord_alert(message):
         print(f"Error sending request: {e}")
 
 #Threshold for alerts
-BUY_THRESHOLD = 350000
+BUY_THRESHOLD = 345000
 
 def check_thresholds(price):
     if price >= BUY_THRESHOLD:
