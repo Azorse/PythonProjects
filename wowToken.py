@@ -29,15 +29,19 @@ def send_discord_alert(message):
         print(f"Error sending request: {e}")
 
 #Threshold for alerts
-BUY_THRESHOLD = 345000
+BUY_THRESHOLD = 350000
+SELL_THRESHOLD = 150000
 
 def check_thresholds(price):
     if price >= BUY_THRESHOLD:
         #print(f"Sending Discord Alert...")
-        message = f"@here: Good time to buy! Current price is {price} gold."
+        message = f"@here: Time to Buy, Current price is {price} gold."
+        send_discord_alert(message)
+    elif price <= SELL_THRESHOLD:
+        message = f"@here: Time to Sell, Current price is {price} gold."
         send_discord_alert(message)
     else:
-        print(f"No action taken")
+        print(f"No actions taken")
 
 class BlizzardApiClient:
     def __init__(self):
@@ -63,7 +67,7 @@ class BlizzardApiClient:
 def job():
     api = BlizzardApiClient()
     token_price = api.get_gold_price()
-    print(f"The current WoW token price in the USA is {token_price} gold!")
+    print(f"The current WoW token price is {token_price} gold.")
     check_thresholds(token_price)
 
 # Schedule the job to run every hour
