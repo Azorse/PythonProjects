@@ -7,17 +7,13 @@ from dotenv import load_dotenv
 # Load environment variables from .env file
 load_dotenv()
 
-# Test printing out an environment variable
-#print("API Client ID:", os.getenv('BLIZZARD_CLIENT_ID'))
-
-# Discord Alerts
+# Define the send_discord_alert function
 def send_discord_alert(message):
     webhook_url = os.getenv('WEBHOOK_URL')
     print(f"Webhook URL: {webhook_url}")  # Debug print to check the URL
     if webhook_url is None:
         print("Webhook URL not found in environment variables.")
         return
-
     data = {"content": message, "username": "WoW Token Bot"}
     try:
         response = requests.post(webhook_url, json=data)
@@ -28,21 +24,7 @@ def send_discord_alert(message):
     except requests.exceptions.RequestException as e:
         print(f"Error sending request: {e}")
 
-#Threshold for alerts
-BUY_THRESHOLD = 350000
-SELL_THRESHOLD = 150000
-
-def check_thresholds(price):
-    if price >= BUY_THRESHOLD:
-        #print(f"Sending Discord Alert...")
-        message = f"@here: Time to Buy, Current price is {price} gold."
-        send_discord_alert(message)
-    elif price <= SELL_THRESHOLD:
-        message = f"@here: Time to Sell, Current price is {price} gold."
-        send_discord_alert(message)
-    else:
-        print(f"No actions taken")
-
+# Define the BlizzardApiClient
 class BlizzardApiClient:
     def __init__(self):
         self.client_id = os.getenv('BLIZZARD_CLIENT_ID')
@@ -59,10 +41,24 @@ class BlizzardApiClient:
         return token_response['access_token']
 
     def get_gold_price(self):
-        url = f"https://us.api.blizzard.com/data/wow/token/?namespace=dynamic-us&locale=en_US&access_token={self.access_token}"
-        response = requests.get(url)
+        url = "https://us.api.blizzard.com/data/wow/token/?namespace=dynamic-us&locale=en_US"
+        headers = {
+            'Authorization': f'Bearer {self.access_token}'
+        }
+        response = requests.get(url, headers=headers)
         data = response.json()
         return int(data['price'] / 10000)
+
+# Define threshold checks and scheduling
+def check_thresholds(price):
+    if price >= 350000:
+        message = f"@here: Time to Buy, Current price is {price} gold."
+        send_discord_alert(message)
+    elif price <= 150000:
+        message = f"@here: Time to Sell, Current price is {price} gold."
+        send_discord_alert(message)
+    else:
+        print(f"No actions taken")
 
 def job():
     api = BlizzardApiClient()
@@ -74,10 +70,8 @@ def job():
 schedule.every().hour.do(job)
 
 if __name__ == '__main__':
-    # Run the job once at the start
-    job()
-    
-    # Keep the script running and check the schedule
+    job() 
     while True:
         schedule.run_pending()
         time.sleep(1)
+
