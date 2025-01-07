@@ -51,7 +51,7 @@ class BlizzardApiClient:
 
 # Define threshold checks and scheduling
 def check_thresholds(price):
-    if price >= 350000:
+    if price >= 333000:
         message = f"@here: Time to Buy, Current price is {price} gold."
         send_discord_alert(message)
     elif price <= 150000:
